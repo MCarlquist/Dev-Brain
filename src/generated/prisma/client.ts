@@ -61,3 +61,8 @@ export type Note = Prisma.NoteModel
  * 
  */
 export type Link = Prisma.LinkModel
+/**
+ * Model Tags
+ * 
+ */
+export type Tags = Prisma.TagsModel

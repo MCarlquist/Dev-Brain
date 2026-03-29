@@ -387,7 +387,8 @@ export const ModelName = {
   Project: 'Project',
   Snippet: 'Snippet',
   Note: 'Note',
-  Link: 'Link'
+  Link: 'Link',
+  Tags: 'Tags'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -403,7 +404,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "project" | "snippet" | "note" | "link"
+    modelProps: "project" | "snippet" | "note" | "link" | "tags"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -703,6 +704,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Tags: {
+      payload: Prisma.$TagsPayload<ExtArgs>
+      fields: Prisma.TagsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TagsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TagsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TagsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TagsPayload>
+        }
+        findFirst: {
+          args: Prisma.TagsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TagsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TagsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TagsPayload>
+        }
+        findMany: {
+          args: Prisma.TagsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TagsPayload>[]
+        }
+        create: {
+          args: Prisma.TagsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TagsPayload>
+        }
+        createMany: {
+          args: Prisma.TagsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TagsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TagsPayload>[]
+        }
+        delete: {
+          args: Prisma.TagsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TagsPayload>
+        }
+        update: {
+          args: Prisma.TagsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TagsPayload>
+        }
+        deleteMany: {
+          args: Prisma.TagsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TagsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TagsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TagsPayload>[]
+        }
+        upsert: {
+          args: Prisma.TagsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TagsPayload>
+        }
+        aggregate: {
+          args: Prisma.TagsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTags>
+        }
+        groupBy: {
+          args: Prisma.TagsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TagsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TagsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TagsCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -790,6 +865,17 @@ export const LinkScalarFieldEnum = {
 } as const
 
 export type LinkScalarFieldEnum = (typeof LinkScalarFieldEnum)[keyof typeof LinkScalarFieldEnum]
+
+
+export const TagsScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  projectId: 'projectId'
+} as const
+
+export type TagsScalarFieldEnum = (typeof TagsScalarFieldEnum)[keyof typeof TagsScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -976,6 +1062,7 @@ export type GlobalOmitConfig = {
   snippet?: Prisma.SnippetOmit
   note?: Prisma.NoteOmit
   link?: Prisma.LinkOmit
+  tags?: Prisma.TagsOmit
 }
 
 /* Types for Logging */

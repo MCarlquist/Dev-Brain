@@ -219,6 +219,7 @@ export type ProjectWhereInput = {
   snippets?: Prisma.SnippetListRelationFilter
   notes?: Prisma.NoteListRelationFilter
   links?: Prisma.LinkListRelationFilter
+  tags?: Prisma.TagsListRelationFilter
 }
 
 export type ProjectOrderByWithRelationInput = {
@@ -230,6 +231,7 @@ export type ProjectOrderByWithRelationInput = {
   snippets?: Prisma.SnippetOrderByRelationAggregateInput
   notes?: Prisma.NoteOrderByRelationAggregateInput
   links?: Prisma.LinkOrderByRelationAggregateInput
+  tags?: Prisma.TagsOrderByRelationAggregateInput
 }
 
 export type ProjectWhereUniqueInput = Prisma.AtLeast<{
@@ -244,6 +246,7 @@ export type ProjectWhereUniqueInput = Prisma.AtLeast<{
   snippets?: Prisma.SnippetListRelationFilter
   notes?: Prisma.NoteListRelationFilter
   links?: Prisma.LinkListRelationFilter
+  tags?: Prisma.TagsListRelationFilter
 }, "id">
 
 export type ProjectOrderByWithAggregationInput = {
@@ -278,6 +281,7 @@ export type ProjectCreateInput = {
   snippets?: Prisma.SnippetCreateNestedManyWithoutProjectInput
   notes?: Prisma.NoteCreateNestedManyWithoutProjectInput
   links?: Prisma.LinkCreateNestedManyWithoutProjectInput
+  tags?: Prisma.TagsCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateInput = {
@@ -289,6 +293,7 @@ export type ProjectUncheckedCreateInput = {
   snippets?: Prisma.SnippetUncheckedCreateNestedManyWithoutProjectInput
   notes?: Prisma.NoteUncheckedCreateNestedManyWithoutProjectInput
   links?: Prisma.LinkUncheckedCreateNestedManyWithoutProjectInput
+  tags?: Prisma.TagsUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUpdateInput = {
@@ -299,6 +304,7 @@ export type ProjectUpdateInput = {
   snippets?: Prisma.SnippetUpdateManyWithoutProjectNestedInput
   notes?: Prisma.NoteUpdateManyWithoutProjectNestedInput
   links?: Prisma.LinkUpdateManyWithoutProjectNestedInput
+  tags?: Prisma.TagsUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateInput = {
@@ -310,6 +316,7 @@ export type ProjectUncheckedUpdateInput = {
   snippets?: Prisma.SnippetUncheckedUpdateManyWithoutProjectNestedInput
   notes?: Prisma.NoteUncheckedUpdateManyWithoutProjectNestedInput
   links?: Prisma.LinkUncheckedUpdateManyWithoutProjectNestedInput
+  tags?: Prisma.TagsUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateManyInput = {
@@ -434,6 +441,20 @@ export type ProjectUpdateOneRequiredWithoutLinksNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ProjectUpdateToOneWithWhereWithoutLinksInput, Prisma.ProjectUpdateWithoutLinksInput>, Prisma.ProjectUncheckedUpdateWithoutLinksInput>
 }
 
+export type ProjectCreateNestedOneWithoutTagsInput = {
+  create?: Prisma.XOR<Prisma.ProjectCreateWithoutTagsInput, Prisma.ProjectUncheckedCreateWithoutTagsInput>
+  connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutTagsInput
+  connect?: Prisma.ProjectWhereUniqueInput
+}
+
+export type ProjectUpdateOneRequiredWithoutTagsNestedInput = {
+  create?: Prisma.XOR<Prisma.ProjectCreateWithoutTagsInput, Prisma.ProjectUncheckedCreateWithoutTagsInput>
+  connectOrCreate?: Prisma.ProjectCreateOrConnectWithoutTagsInput
+  upsert?: Prisma.ProjectUpsertWithoutTagsInput
+  connect?: Prisma.ProjectWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ProjectUpdateToOneWithWhereWithoutTagsInput, Prisma.ProjectUpdateWithoutTagsInput>, Prisma.ProjectUncheckedUpdateWithoutTagsInput>
+}
+
 export type ProjectCreateWithoutSnippetsInput = {
   name: string
   description?: string | null
@@ -441,6 +462,7 @@ export type ProjectCreateWithoutSnippetsInput = {
   updatedAt?: Date | string
   notes?: Prisma.NoteCreateNestedManyWithoutProjectInput
   links?: Prisma.LinkCreateNestedManyWithoutProjectInput
+  tags?: Prisma.TagsCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutSnippetsInput = {
@@ -451,6 +473,7 @@ export type ProjectUncheckedCreateWithoutSnippetsInput = {
   updatedAt?: Date | string
   notes?: Prisma.NoteUncheckedCreateNestedManyWithoutProjectInput
   links?: Prisma.LinkUncheckedCreateNestedManyWithoutProjectInput
+  tags?: Prisma.TagsUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutSnippetsInput = {
@@ -476,6 +499,7 @@ export type ProjectUpdateWithoutSnippetsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NoteUpdateManyWithoutProjectNestedInput
   links?: Prisma.LinkUpdateManyWithoutProjectNestedInput
+  tags?: Prisma.TagsUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutSnippetsInput = {
@@ -486,6 +510,7 @@ export type ProjectUncheckedUpdateWithoutSnippetsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NoteUncheckedUpdateManyWithoutProjectNestedInput
   links?: Prisma.LinkUncheckedUpdateManyWithoutProjectNestedInput
+  tags?: Prisma.TagsUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutNotesInput = {
@@ -495,6 +520,7 @@ export type ProjectCreateWithoutNotesInput = {
   updatedAt?: Date | string
   snippets?: Prisma.SnippetCreateNestedManyWithoutProjectInput
   links?: Prisma.LinkCreateNestedManyWithoutProjectInput
+  tags?: Prisma.TagsCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutNotesInput = {
@@ -505,6 +531,7 @@ export type ProjectUncheckedCreateWithoutNotesInput = {
   updatedAt?: Date | string
   snippets?: Prisma.SnippetUncheckedCreateNestedManyWithoutProjectInput
   links?: Prisma.LinkUncheckedCreateNestedManyWithoutProjectInput
+  tags?: Prisma.TagsUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutNotesInput = {
@@ -530,6 +557,7 @@ export type ProjectUpdateWithoutNotesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   snippets?: Prisma.SnippetUpdateManyWithoutProjectNestedInput
   links?: Prisma.LinkUpdateManyWithoutProjectNestedInput
+  tags?: Prisma.TagsUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutNotesInput = {
@@ -540,6 +568,7 @@ export type ProjectUncheckedUpdateWithoutNotesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   snippets?: Prisma.SnippetUncheckedUpdateManyWithoutProjectNestedInput
   links?: Prisma.LinkUncheckedUpdateManyWithoutProjectNestedInput
+  tags?: Prisma.TagsUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectCreateWithoutLinksInput = {
@@ -549,6 +578,7 @@ export type ProjectCreateWithoutLinksInput = {
   updatedAt?: Date | string
   snippets?: Prisma.SnippetCreateNestedManyWithoutProjectInput
   notes?: Prisma.NoteCreateNestedManyWithoutProjectInput
+  tags?: Prisma.TagsCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectUncheckedCreateWithoutLinksInput = {
@@ -559,6 +589,7 @@ export type ProjectUncheckedCreateWithoutLinksInput = {
   updatedAt?: Date | string
   snippets?: Prisma.SnippetUncheckedCreateNestedManyWithoutProjectInput
   notes?: Prisma.NoteUncheckedCreateNestedManyWithoutProjectInput
+  tags?: Prisma.TagsUncheckedCreateNestedManyWithoutProjectInput
 }
 
 export type ProjectCreateOrConnectWithoutLinksInput = {
@@ -584,6 +615,7 @@ export type ProjectUpdateWithoutLinksInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   snippets?: Prisma.SnippetUpdateManyWithoutProjectNestedInput
   notes?: Prisma.NoteUpdateManyWithoutProjectNestedInput
+  tags?: Prisma.TagsUpdateManyWithoutProjectNestedInput
 }
 
 export type ProjectUncheckedUpdateWithoutLinksInput = {
@@ -594,6 +626,65 @@ export type ProjectUncheckedUpdateWithoutLinksInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   snippets?: Prisma.SnippetUncheckedUpdateManyWithoutProjectNestedInput
   notes?: Prisma.NoteUncheckedUpdateManyWithoutProjectNestedInput
+  tags?: Prisma.TagsUncheckedUpdateManyWithoutProjectNestedInput
+}
+
+export type ProjectCreateWithoutTagsInput = {
+  name: string
+  description?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  snippets?: Prisma.SnippetCreateNestedManyWithoutProjectInput
+  notes?: Prisma.NoteCreateNestedManyWithoutProjectInput
+  links?: Prisma.LinkCreateNestedManyWithoutProjectInput
+}
+
+export type ProjectUncheckedCreateWithoutTagsInput = {
+  id?: number
+  name: string
+  description?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  snippets?: Prisma.SnippetUncheckedCreateNestedManyWithoutProjectInput
+  notes?: Prisma.NoteUncheckedCreateNestedManyWithoutProjectInput
+  links?: Prisma.LinkUncheckedCreateNestedManyWithoutProjectInput
+}
+
+export type ProjectCreateOrConnectWithoutTagsInput = {
+  where: Prisma.ProjectWhereUniqueInput
+  create: Prisma.XOR<Prisma.ProjectCreateWithoutTagsInput, Prisma.ProjectUncheckedCreateWithoutTagsInput>
+}
+
+export type ProjectUpsertWithoutTagsInput = {
+  update: Prisma.XOR<Prisma.ProjectUpdateWithoutTagsInput, Prisma.ProjectUncheckedUpdateWithoutTagsInput>
+  create: Prisma.XOR<Prisma.ProjectCreateWithoutTagsInput, Prisma.ProjectUncheckedCreateWithoutTagsInput>
+  where?: Prisma.ProjectWhereInput
+}
+
+export type ProjectUpdateToOneWithWhereWithoutTagsInput = {
+  where?: Prisma.ProjectWhereInput
+  data: Prisma.XOR<Prisma.ProjectUpdateWithoutTagsInput, Prisma.ProjectUncheckedUpdateWithoutTagsInput>
+}
+
+export type ProjectUpdateWithoutTagsInput = {
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  snippets?: Prisma.SnippetUpdateManyWithoutProjectNestedInput
+  notes?: Prisma.NoteUpdateManyWithoutProjectNestedInput
+  links?: Prisma.LinkUpdateManyWithoutProjectNestedInput
+}
+
+export type ProjectUncheckedUpdateWithoutTagsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  snippets?: Prisma.SnippetUncheckedUpdateManyWithoutProjectNestedInput
+  notes?: Prisma.NoteUncheckedUpdateManyWithoutProjectNestedInput
+  links?: Prisma.LinkUncheckedUpdateManyWithoutProjectNestedInput
 }
 
 
@@ -605,12 +696,14 @@ export type ProjectCountOutputType = {
   snippets: number
   notes: number
   links: number
+  tags: number
 }
 
 export type ProjectCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   snippets?: boolean | ProjectCountOutputTypeCountSnippetsArgs
   notes?: boolean | ProjectCountOutputTypeCountNotesArgs
   links?: boolean | ProjectCountOutputTypeCountLinksArgs
+  tags?: boolean | ProjectCountOutputTypeCountTagsArgs
 }
 
 /**
@@ -644,6 +737,13 @@ export type ProjectCountOutputTypeCountLinksArgs<ExtArgs extends runtime.Types.E
   where?: Prisma.LinkWhereInput
 }
 
+/**
+ * ProjectCountOutputType without action
+ */
+export type ProjectCountOutputTypeCountTagsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TagsWhereInput
+}
+
 
 export type ProjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -654,6 +754,7 @@ export type ProjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   snippets?: boolean | Prisma.Project$snippetsArgs<ExtArgs>
   notes?: boolean | Prisma.Project$notesArgs<ExtArgs>
   links?: boolean | Prisma.Project$linksArgs<ExtArgs>
+  tags?: boolean | Prisma.Project$tagsArgs<ExtArgs>
   _count?: boolean | Prisma.ProjectCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["project"]>
 
@@ -686,6 +787,7 @@ export type ProjectInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   snippets?: boolean | Prisma.Project$snippetsArgs<ExtArgs>
   notes?: boolean | Prisma.Project$notesArgs<ExtArgs>
   links?: boolean | Prisma.Project$linksArgs<ExtArgs>
+  tags?: boolean | Prisma.Project$tagsArgs<ExtArgs>
   _count?: boolean | Prisma.ProjectCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ProjectIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -697,6 +799,7 @@ export type $ProjectPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     snippets: Prisma.$SnippetPayload<ExtArgs>[]
     notes: Prisma.$NotePayload<ExtArgs>[]
     links: Prisma.$LinkPayload<ExtArgs>[]
+    tags: Prisma.$TagsPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1101,6 +1204,7 @@ export interface Prisma__ProjectClient<T, Null = never, ExtArgs extends runtime.
   snippets<T extends Prisma.Project$snippetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$snippetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SnippetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notes<T extends Prisma.Project$notesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$notesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   links<T extends Prisma.Project$linksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$linksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LinkPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  tags<T extends Prisma.Project$tagsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Project$tagsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TagsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1597,6 +1701,30 @@ export type Project$linksArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.LinkScalarFieldEnum | Prisma.LinkScalarFieldEnum[]
+}
+
+/**
+ * Project.tags
+ */
+export type Project$tagsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Tags
+   */
+  select?: Prisma.TagsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Tags
+   */
+  omit?: Prisma.TagsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TagsInclude<ExtArgs> | null
+  where?: Prisma.TagsWhereInput
+  orderBy?: Prisma.TagsOrderByWithRelationInput | Prisma.TagsOrderByWithRelationInput[]
+  cursor?: Prisma.TagsWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TagsScalarFieldEnum | Prisma.TagsScalarFieldEnum[]
 }
 
 /**
