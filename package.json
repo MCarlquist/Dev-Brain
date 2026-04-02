@@ -9,7 +9,6 @@
     "snippet",
     "manager",
     "typescript",
-    "prisma",
     "fullstack"
   ],
   "homepage": "https://github.com/MCarlquist/Dev-Brain#readme",
@@ -32,18 +31,11 @@
     "lint": "eslint",
     "format": "prettier --check .",
     "check": "prettier --write . && eslint --fix",
-    "post-cta-init": "npx -y create-db@latest --user-agent tanstack/tsrouter",
-    "db:generate": "dotenv -e .env.local -- prisma generate",
-    "db:push": "dotenv -e .env.local -- prisma db push",
-    "db:migrate": "dotenv -e .env.local -- prisma migrate dev",
-    "db:studio": "dotenv -e .env.local -- prisma studio",
-    "db:seed": "dotenv -e .env.local -- prisma db seed"
+    "post-cta-init": "npx -y create-db@latest --user-agent tanstack/tsrouter"
   },
   "dependencies": {
     "@fontsource-variable/figtree": "^5.2.10",
     "@fontsource-variable/geist-mono": "^5.2.7",
-    "@prisma/adapter-pg": "^7.4.2",
-    "@prisma/client": "^7.4.2",
     "@tailwindcss/vite": "^4.1.18",
     "@tanstack/react-devtools": "latest",
     "@tanstack/react-form": "^1.28.5",
@@ -56,7 +48,6 @@
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "lucide-react": "^0.577.0",
-    "prisma": "^7.4.2",
     "radix-ui": "^1.4.3",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
