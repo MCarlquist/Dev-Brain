@@ -49,7 +49,10 @@ type UpdateProjectInput = {
 }
 
 const getProjectsFn = createServerFn({ method: 'GET' }).handler(async () => {
-  const { getProjects } = await import('#/server/db')
+  const { getProjects, dbFileExists } = await import('#/server/db')
+  if (!(await dbFileExists())) {
+    return false
+  }
   return getProjects()
 });
 
@@ -84,8 +87,11 @@ export const Route = createFileRoute('/dashboard/project')({
 })
 
 function RouteComponent() {
-  const initialProjects = Route.useLoaderData()
-  const [projects, setProjects] = useState<ProjectListItem[]>(initialProjects)
+  const initialProjects = Route.useLoaderData() as ProjectListItem[] | false
+  const [projects, setProjects] = useState<ProjectListItem[]>(
+    Array.isArray(initialProjects) ? initialProjects : []
+  )
+  const [dbMissing, setDbMissing] = useState(initialProjects === false)
   const [createDialogOpen, setCreateDialogOpen] = useState(false)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
 
@@ -94,7 +100,12 @@ function RouteComponent() {
   const deleteProjectMutation = useServerFn(deleteProjectFn)
 
   useEffect(() => {
-    setProjects(initialProjects)
+    if (Array.isArray(initialProjects)) {
+      setProjects(initialProjects)
+      setDbMissing(false)
+    } else {
+      setDbMissing(true)
+    }
   }, [initialProjects])
 
   const createForm = useForm({
@@ -171,7 +182,7 @@ function RouteComponent() {
         </div>
         <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
           <DialogTrigger asChild>
-            {projects.length === 0 ? (
+            {projects.length === 0 && !dbMissing ? (
               ''
             ) : (
               <Button onClick={() => setCreateDialogOpen(true)}>

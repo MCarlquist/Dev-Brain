@@ -1,6 +1,17 @@
-import { readFile, writeFile } from 'fs/promises'
+import { access, readFile, writeFile } from 'fs/promises'
+import { fileURLToPath } from 'url'
 
 const dbFileUrl = new URL('../data/db.json', import.meta.url)
+const dbFilePath = fileURLToPath(dbFileUrl)
+
+export async function dbFileExists(): Promise<boolean> {
+  try {
+    await access(dbFilePath)
+    return true
+  } catch {
+    return false
+  }
+}
 
 export interface Project {
   id: number
