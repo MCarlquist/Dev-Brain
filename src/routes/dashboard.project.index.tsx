@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, Link as LinkA } from '@tanstack/react-router';
 import {
   Empty,
   EmptyContent,
@@ -81,7 +81,7 @@ const deleteProjectFn = createServerFn({ method: 'POST' })
     return { id: data.id }
   })
 
-export const Route = createFileRoute('/dashboard/project')({
+export const Route = createFileRoute('/dashboard/project/')({
   component: RouteComponent,
   loader: async () => getProjectsFn(),
 })
@@ -337,6 +337,11 @@ function RouteComponent() {
                   </Button>
                   <Button variant="destructive" size="sm" onClick={() => handleDeleteProject(project)}>
                     <Trash2 className="size-4" /> Delete
+                  </Button>
+                  <Button variant={'default'} size={'sm'} asChild>
+                    <LinkA to={`/dashboard/project/$id`.replace('$id', String(project.id))}>
+                      View
+                    </LinkA>
                   </Button>
                 </div>
               </CardFooter>

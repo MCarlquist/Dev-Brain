@@ -1,1 +1,1 @@
-export type { Project, ProjectListItem, Database, Snippet, Note, Link, Tag } from './server/db'
+export type { Project, ProjectDetail, ProjectListItem, Database, Snippet, Note, Link, Tag } from './server/db'

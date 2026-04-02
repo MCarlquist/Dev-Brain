@@ -1,16 +1,25 @@
-import { access, readFile, writeFile } from 'fs/promises'
-import { fileURLToPath } from 'url'
-
 const dbFileUrl = new URL('../data/db.json', import.meta.url)
-const dbFilePath = fileURLToPath(dbFileUrl)
 
 export async function dbFileExists(): Promise<boolean> {
+  const { access } = await import('node:fs/promises')
+
   try {
-    await access(dbFilePath)
+    await access(dbFileUrl)
     return true
   } catch {
     return false
   }
+}
+
+async function readDb(): Promise<Database> {
+  const { readFile } = await import('node:fs/promises')
+  const data = await readFile(dbFileUrl, 'utf-8')
+  return JSON.parse(data) as Database
+}
+
+async function writeDb(data: Database) {
+  const { writeFile } = await import('node:fs/promises')
+  await writeFile(dbFileUrl, JSON.stringify(data, null, 2) + '\n', 'utf-8')
 }
 
 export interface Project {
@@ -76,13 +85,16 @@ export interface ProjectListItem extends Project {
   }
 }
 
-async function readDb(): Promise<Database> {
-  const data = await readFile(dbFileUrl, 'utf-8')
-  return JSON.parse(data) as Database
-}
-
-async function writeDb(data: Database) {
-  await writeFile(dbFileUrl, JSON.stringify(data, null, 2) + '\n', 'utf-8')
+export interface ProjectDetail extends Project {
+  tags: Tag[]
+  snippets: Snippet[]
+  notes: Note[]
+  links: Link[]
+  _count: {
+    snippets: number
+    notes: number
+    links: number
+  }
 }
 
 function getNextId(items: { id: number }[]) {
@@ -101,6 +113,117 @@ export async function getProjects(): Promise<ProjectListItem[]> {
       links: db.links.filter((link) => link.projectId === project.id).length,
     },
   }))
+}
+
+export async function getProjectById(id: number): Promise<ProjectDetail | null> {
+  const db = await readDb()
+  const project = db.projects.find((project) => project.id === id)
+
+  if (!project) {
+    return null
+  }
+
+  const snippets = db.snippets.filter((snippet) => snippet.projectId === id)
+  const notes = db.notes.filter((note) => note.projectId === id)
+  const links = db.links.filter((link) => link.projectId === id)
+  const tags = db.tags.filter((tag) => tag.projectId === id)
+
+  return {
+    ...project,
+    snippets,
+    notes,
+    links,
+    tags,
+    _count: {
+      snippets: snippets.length,
+      notes: notes.length,
+      links: links.length,
+    },
+  }
+}
+
+export async function createSnippet(data: {
+  title: string
+  description: string
+  language: string
+  code: string
+  projectId: number
+}): Promise<Snippet> {
+  const db = await readDb()
+  const now = new Date().toISOString()
+  const snippet: Snippet = {
+    id: getNextId(db.snippets),
+    title: data.title,
+    description: data.description,
+    language: data.language,
+    code: data.code,
+    projectId: data.projectId,
+    createdAt: now,
+    updatedAt: now,
+  }
+
+  db.snippets.push(snippet)
+  const project = db.projects.find((project) => project.id === data.projectId)
+  if (project) {
+    project.updatedAt = now
+  }
+
+  await writeDb(db)
+  return snippet
+}
+
+export async function createNote(data: {
+  title: string
+  content: string
+  projectId: number
+}): Promise<Note> {
+  const db = await readDb()
+  const now = new Date().toISOString()
+  const note: Note = {
+    id: getNextId(db.notes),
+    title: data.title,
+    content: data.content,
+    projectId: data.projectId,
+    createdAt: now,
+    updatedAt: now,
+  }
+
+  db.notes.push(note)
+  const project = db.projects.find((project) => project.id === data.projectId)
+  if (project) {
+    project.updatedAt = now
+  }
+
+  await writeDb(db)
+  return note
+}
+
+export async function createLink(data: {
+  title: string
+  url: string
+  description: string
+  projectId: number
+}): Promise<Link> {
+  const db = await readDb()
+  const now = new Date().toISOString()
+  const link: Link = {
+    id: getNextId(db.links),
+    title: data.title,
+    url: data.url,
+    description: data.description,
+    projectId: data.projectId,
+    createdAt: now,
+    updatedAt: now,
+  }
+
+  db.links.push(link)
+  const project = db.projects.find((project) => project.id === data.projectId)
+  if (project) {
+    project.updatedAt = now
+  }
+
+  await writeDb(db)
+  return link
 }
 
 export async function createProject(data: { name: string; description: string }): Promise<Project> {
