@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 import { createServerFn, useServerFn } from '@tanstack/react-start'
 import { useMemo, useState } from 'react'
 import { useForm } from '@tanstack/react-form'
@@ -24,7 +24,8 @@ import { Field, FieldGroup } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import type { ProjectDetail } from '#/db'
+import type { ProjectDetail } from '../types'
+import { Trash2 } from 'lucide-react'
 
 type CreateSnippetInput = {
   title: string
@@ -47,6 +48,14 @@ type CreateLinkInput = {
   projectId: number
 }
 
+const deleteProjectFn = createServerFn({ method: 'POST' })
+  .inputValidator((data: { id: number }) => data)
+  .handler(async ({ data }) => {
+    const { deleteProject } = await import('#/server/db')
+    await deleteProject(data.id)
+    return { id: data.id }
+  })
+
 const createSnippetFn = createServerFn({ method: 'POST' })
   .inputValidator((data: CreateSnippetInput) => data)
   .handler(async ({ data }) => {
@@ -68,6 +77,16 @@ const createLinkFn = createServerFn({ method: 'POST' })
     return createLink(data)
   })
 
+const getProjectByIdFn = createServerFn({ method: 'GET' })
+  .inputValidator((data: { id: number }) => data)
+  .handler(async ({ data }) => {
+    const { getProjectById, dbFileExists } = await import('#/server/db')
+    if (!(await dbFileExists())) {
+      return null
+    }
+    return getProjectById(data.id)
+  })
+
 export const Route = createFileRoute('/dashboard/project/$id')({
   component: RouteComponent,
   loader: async ({ params }) => {
@@ -76,12 +95,7 @@ export const Route = createFileRoute('/dashboard/project/$id')({
       throw new Error(`Invalid project id: ${params.id}`)
     }
 
-    const { getProjectById, dbFileExists } = await import('#/server/db')
-    if (!(await dbFileExists())) {
-      return null
-    }
-
-    return getProjectById(id)
+    return getProjectByIdFn({ data: { id } })
   },
 })
 
@@ -90,6 +104,7 @@ function RouteComponent() {
   const createSnippetMutation = useServerFn(createSnippetFn)
   const createNoteMutation = useServerFn(createNoteFn)
   const createLinkMutation = useServerFn(createLinkFn)
+  const deleteProjectMutation = useServerFn(deleteProjectFn)
 
   const [snippets, setSnippets] = useState(loaderData?.snippets ?? [])
   const [notes, setNotes] = useState(loaderData?.notes ?? [])
@@ -104,8 +119,19 @@ function RouteComponent() {
       notes: notes.length,
       links: links.length,
     }),
-    [snippets, notes, links]
+    [snippets, notes, links],
   )
+
+  const handleDeleteProject = async () => {
+    if (!loaderData) return
+
+    if (!window.confirm(`Delete project "${loaderData.name}"?`)) {
+      return
+    }
+
+    await deleteProjectMutation({ data: { id: loaderData.id } })
+    redirect({ to: '/dashboard/project' })
+  }
 
   const snippetForm = useForm({
     defaultValues: {
@@ -116,7 +142,9 @@ function RouteComponent() {
       projectId: loaderData?.id ?? 0,
     },
     onSubmit: async ({ value }) => {
-      const created = await createSnippetMutation({ data: value as CreateSnippetInput })
+      const created = await createSnippetMutation({
+        data: value as CreateSnippetInput,
+      })
       setSnippets((current) => [...current, created])
       setSnippetDialogOpen(false)
     },
@@ -129,7 +157,9 @@ function RouteComponent() {
       projectId: loaderData?.id ?? 0,
     },
     onSubmit: async ({ value }) => {
-      const created = await createNoteMutation({ data: value as CreateNoteInput })
+      const created = await createNoteMutation({
+        data: value as CreateNoteInput,
+      })
       setNotes((current) => [...current, created])
       setNoteDialogOpen(false)
     },
@@ -143,7 +173,9 @@ function RouteComponent() {
       projectId: loaderData?.id ?? 0,
     },
     onSubmit: async ({ value }) => {
-      const created = await createLinkMutation({ data: value as CreateLinkInput })
+      const created = await createLinkMutation({
+        data: value as CreateLinkInput,
+      })
       setLinks((current) => [...current, created])
       setLinkDialogOpen(false)
     },
@@ -156,14 +188,14 @@ function RouteComponent() {
           <CardHeader>
             <CardTitle>Project not available</CardTitle>
             <CardDescription>
-              The project data is unavailable right now. Make sure the JSON datastore is present
-              and try again.
+              The project data is unavailable right now. Make sure the JSON
+              datastore is present and try again.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              If this keeps happening, verify that `src/data/db.json` exists and contains a valid
-              project record.
+              If this keeps happening, verify that `src/data/db.json` exists and
+              contains a valid project record.
             </p>
           </CardContent>
         </Card>
@@ -173,9 +205,14 @@ function RouteComponent() {
 
   return (
     <div className="space-y-8">
-      <div className="space-y-4">
-        <h1 className="text-5xl font-bold">{loaderData.name}</h1>
-        <p className="max-w-2xl text-balance">{loaderData.description}</p>
+      <div className="b-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-5xl font-bold">{loaderData.name}</h1>
+          <p className="max-w-2xl text-balance">{loaderData.description}</p>
+        </div>
+        <Button variant="destructive" size="sm" onClick={handleDeleteProject}>
+          <Trash2 className="size-4" /> Delete Project
+        </Button>
       </div>
 
       <Tabs defaultValue="overview" className="space-y-4">
@@ -190,31 +227,43 @@ function RouteComponent() {
           <Card>
             <CardHeader>
               <CardTitle>Overview</CardTitle>
-              <CardDescription>Project metadata and related counts.</CardDescription>
+              <CardDescription>
+                Project metadata and related counts.
+              </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4">
               <div className="grid gap-2 sm:grid-cols-2">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Created</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Created
+                  </p>
                   <p>{new Date(loaderData.createdAt).toLocaleString()}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Updated</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Updated
+                  </p>
                   <p>{new Date(loaderData.updatedAt).toLocaleString()}</p>
                 </div>
               </div>
 
               <div className="grid gap-2 sm:grid-cols-3">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Snippets</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Snippets
+                  </p>
                   <p>{counts.snippets}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Notes</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Notes
+                  </p>
                   <p>{counts.notes}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Links</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Links
+                  </p>
                   <p>{counts.links}</p>
                 </div>
               </div>
@@ -231,7 +280,9 @@ function RouteComponent() {
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-muted-foreground">No tags added yet.</p>
+                <p className="text-sm text-muted-foreground">
+                  No tags added yet.
+                </p>
               )}
             </CardContent>
           </Card>
@@ -242,9 +293,14 @@ function RouteComponent() {
             <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div>
                 <CardTitle>Snippets</CardTitle>
-                <CardDescription>Code snippets saved for this project.</CardDescription>
+                <CardDescription>
+                  Code snippets saved for this project.
+                </CardDescription>
               </div>
-              <Dialog open={snippetDialogOpen} onOpenChange={setSnippetDialogOpen}>
+              <Dialog
+                open={snippetDialogOpen}
+                onOpenChange={setSnippetDialogOpen}
+              >
                 <DialogTrigger asChild>
                   <Button size="sm">Add Snippet</Button>
                 </DialogTrigger>
@@ -269,7 +325,9 @@ function RouteComponent() {
                               name={field.name}
                               value={field.state.value ?? ''}
                               onBlur={field.handleBlur}
-                              onChange={(event) => field.handleChange(event.target.value)}
+                              onChange={(event) =>
+                                field.handleChange(event.target.value)
+                              }
                               placeholder="Snippet title"
                             />
                           </Field>
@@ -285,7 +343,9 @@ function RouteComponent() {
                               name={field.name}
                               value={field.state.value ?? ''}
                               onBlur={field.handleBlur}
-                              onChange={(event) => field.handleChange(event.target.value)}
+                              onChange={(event) =>
+                                field.handleChange(event.target.value)
+                              }
                               placeholder="e.g. JavaScript"
                             />
                           </Field>
@@ -301,7 +361,9 @@ function RouteComponent() {
                               name={field.name}
                               value={field.state.value ?? ''}
                               onBlur={field.handleBlur}
-                              onChange={(event) => field.handleChange(event.target.value)}
+                              onChange={(event) =>
+                                field.handleChange(event.target.value)
+                              }
                               placeholder="What does this snippet do?"
                             />
                           </Field>
@@ -317,7 +379,9 @@ function RouteComponent() {
                               name={field.name}
                               value={field.state.value ?? ''}
                               onBlur={field.handleBlur}
-                              onChange={(event) => field.handleChange(event.target.value)}
+                              onChange={(event) =>
+                                field.handleChange(event.target.value)
+                              }
                               placeholder="Paste the snippet code here"
                             />
                           </Field>
@@ -336,14 +400,23 @@ function RouteComponent() {
             </CardHeader>
             <CardContent>
               {snippets.length === 0 ? (
-                <p className="text-sm text-muted-foreground">No snippets have been added yet.</p>
+                <p className="text-sm text-muted-foreground">
+                  No snippets have been added yet.
+                </p>
               ) : (
                 <div className="space-y-4">
                   {snippets.map((snippet) => (
-                    <div key={snippet.id} className="rounded-lg border border-border p-4">
+                    <div
+                      key={snippet.id}
+                      className="rounded-lg border border-border p-4"
+                    >
                       <p className="text-sm font-semibold">{snippet.title}</p>
-                      <p className="text-sm text-muted-foreground">{snippet.language}</p>
-                      <p className="mt-2 text-sm leading-6">{snippet.description}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {snippet.language}
+                      </p>
+                      <p className="mt-2 text-sm leading-6">
+                        {snippet.description}
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -357,7 +430,9 @@ function RouteComponent() {
             <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div>
                 <CardTitle>Notes</CardTitle>
-                <CardDescription>Project notes and observations.</CardDescription>
+                <CardDescription>
+                  Project notes and observations.
+                </CardDescription>
               </div>
               <Dialog open={noteDialogOpen} onOpenChange={setNoteDialogOpen}>
                 <DialogTrigger asChild>
@@ -384,7 +459,9 @@ function RouteComponent() {
                               name={field.name}
                               value={field.state.value ?? ''}
                               onBlur={field.handleBlur}
-                              onChange={(event) => field.handleChange(event.target.value)}
+                              onChange={(event) =>
+                                field.handleChange(event.target.value)
+                              }
                               placeholder="Note title"
                             />
                           </Field>
@@ -400,7 +477,9 @@ function RouteComponent() {
                               name={field.name}
                               value={field.state.value ?? ''}
                               onBlur={field.handleBlur}
-                              onChange={(event) => field.handleChange(event.target.value)}
+                              onChange={(event) =>
+                                field.handleChange(event.target.value)
+                              }
                               placeholder="Write the note here"
                             />
                           </Field>
@@ -419,13 +498,20 @@ function RouteComponent() {
             </CardHeader>
             <CardContent>
               {notes.length === 0 ? (
-                <p className="text-sm text-muted-foreground">No notes have been added yet.</p>
+                <p className="text-sm text-muted-foreground">
+                  No notes have been added yet.
+                </p>
               ) : (
                 <div className="space-y-4">
                   {notes.map((note) => (
-                    <div key={note.id} className="rounded-lg border border-border p-4">
+                    <div
+                      key={note.id}
+                      className="rounded-lg border border-border p-4"
+                    >
                       <p className="text-sm font-semibold">{note.title}</p>
-                      <p className="mt-2 text-sm leading-6 text-muted-foreground">{note.content}</p>
+                      <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                        {note.content}
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -439,7 +525,9 @@ function RouteComponent() {
             <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div>
                 <CardTitle>Links</CardTitle>
-                <CardDescription>Reference URLs for the project.</CardDescription>
+                <CardDescription>
+                  Reference URLs for the project.
+                </CardDescription>
               </div>
               <Dialog open={linkDialogOpen} onOpenChange={setLinkDialogOpen}>
                 <DialogTrigger asChild>
@@ -466,7 +554,9 @@ function RouteComponent() {
                               name={field.name}
                               value={field.state.value ?? ''}
                               onBlur={field.handleBlur}
-                              onChange={(event) => field.handleChange(event.target.value)}
+                              onChange={(event) =>
+                                field.handleChange(event.target.value)
+                              }
                               placeholder="Link title"
                             />
                           </Field>
@@ -482,7 +572,9 @@ function RouteComponent() {
                               name={field.name}
                               value={field.state.value ?? ''}
                               onBlur={field.handleBlur}
-                              onChange={(event) => field.handleChange(event.target.value)}
+                              onChange={(event) =>
+                                field.handleChange(event.target.value)
+                              }
                               placeholder="https://example.com"
                             />
                           </Field>
@@ -498,7 +590,9 @@ function RouteComponent() {
                               name={field.name}
                               value={field.state.value ?? ''}
                               onBlur={field.handleBlur}
-                              onChange={(event) => field.handleChange(event.target.value)}
+                              onChange={(event) =>
+                                field.handleChange(event.target.value)
+                              }
                               placeholder="Why this link matters"
                             />
                           </Field>
@@ -517,14 +611,23 @@ function RouteComponent() {
             </CardHeader>
             <CardContent>
               {links.length === 0 ? (
-                <p className="text-sm text-muted-foreground">No links have been added yet.</p>
+                <p className="text-sm text-muted-foreground">
+                  No links have been added yet.
+                </p>
               ) : (
                 <div className="space-y-4">
                   {links.map((link) => (
-                    <div key={link.id} className="rounded-lg border border-border p-4">
+                    <div
+                      key={link.id}
+                      className="rounded-lg border border-border p-4"
+                    >
                       <p className="text-sm font-semibold">{link.title}</p>
-                      <p className="text-sm text-muted-foreground">{link.url}</p>
-                      <p className="mt-2 text-sm leading-6">{link.description}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {link.url}
+                      </p>
+                      <p className="mt-2 text-sm leading-6">
+                        {link.description}
+                      </p>
                     </div>
                   ))}
                 </div>

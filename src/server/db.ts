@@ -1,101 +1,57 @@
-const dbFileUrl = new URL('../data/db.json', import.meta.url)
+const moduleDbUrl = new URL('../data/db.json', import.meta.url)
+import type { Database, Project, ProjectDetail, ProjectListItem, Snippet, Note, Link } from '../types'
 
-export async function dbFileExists(): Promise<boolean> {
+function getCandidatePaths(): URL[] {
+  return [
+    moduleDbUrl,
+    new URL('../../data/db.json', import.meta.url),
+    new URL('../../../data/db.json', import.meta.url),
+  ]
+}
+
+async function resolveDbUrl(): Promise<URL | null> {
   const { access } = await import('node:fs/promises')
 
-  try {
-    await access(dbFileUrl)
-    return true
-  } catch {
-    return false
+  for (const url of getCandidatePaths()) {
+    try {
+      await access(url)
+      return url
+    } catch {
+      // try next
+    }
   }
+
+  return null
+}
+
+export async function dbFileExists(): Promise<boolean> {
+  return (await resolveDbUrl()) !== null
 }
 
 async function readDb(): Promise<Database> {
   const { readFile } = await import('node:fs/promises')
-  const data = await readFile(dbFileUrl, 'utf-8')
+
+  const dbUrl = await resolveDbUrl()
+  if (!dbUrl) {
+    throw new Error('Database file not found: expected src/data/db.json or data/db.json')
+  }
+
+  const data = await readFile(dbUrl, 'utf-8')
   return JSON.parse(data) as Database
 }
 
 async function writeDb(data: Database) {
   const { writeFile } = await import('node:fs/promises')
-  await writeFile(dbFileUrl, JSON.stringify(data, null, 2) + '\n', 'utf-8')
-}
 
-export interface Project {
-  id: number
-  name: string
-  description: string
-  createdAt: string
-  updatedAt: string
-}
-
-export interface Snippet {
-  id: number
-  title: string
-  description: string
-  language: string
-  code: string
-  projectId: number
-  createdAt: string
-  updatedAt: string
-}
-
-export interface Note {
-  id: number
-  title: string
-  content: string
-  projectId: number
-  createdAt: string
-  updatedAt: string
-}
-
-export interface Link {
-  id: number
-  title: string
-  url: string
-  description: string
-  projectId: number
-  createdAt: string
-  updatedAt: string
-}
-
-export interface Tag {
-  id: number
-  name: string
-  projectId: number
-  createdAt: string
-  updatedAt: string
-}
-
-export interface Database {
-  projects: Project[]
-  snippets: Snippet[]
-  notes: Note[]
-  links: Link[]
-  tags: Tag[]
-}
-
-export interface ProjectListItem extends Project {
-  tags: Tag[]
-  _count: {
-    snippets: number
-    notes: number
-    links: number
+  const dbUrl = await resolveDbUrl()
+  if (!dbUrl) {
+    throw new Error('Database file not found: expected src/data/db.json or data/db.json')
   }
+
+  await writeFile(dbUrl, JSON.stringify(data, null, 2) + '\n', 'utf-8')
 }
 
-export interface ProjectDetail extends Project {
-  tags: Tag[]
-  snippets: Snippet[]
-  notes: Note[]
-  links: Link[]
-  _count: {
-    snippets: number
-    notes: number
-    links: number
-  }
-}
+
 
 function getNextId(items: { id: number }[]) {
   return items.length === 0 ? 1 : Math.max(...items.map((item) => item.id)) + 1

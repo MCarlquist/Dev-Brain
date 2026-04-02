@@ -35,7 +35,7 @@ import { useForm } from '@tanstack/react-form'
 import { useEffect, useState } from 'react';
 import { formatDistance } from "date-fns";
 import { enUS } from "date-fns/locale";
-import type { ProjectListItem } from '#/db';
+import type { ProjectListItem } from '../types';
 
 type CreateProjectInput = {
   name: string
@@ -140,11 +140,11 @@ function RouteComponent() {
         current.map((item) =>
           item.id === project.id
             ? {
-                ...item,
-                name: project.name,
-                description: project.description,
-                updatedAt: project.updatedAt,
-              }
+              ...item,
+              name: project.name,
+              description: project.description,
+              updatedAt: project.updatedAt,
+            }
             : item
         )
       )
@@ -303,60 +303,49 @@ function RouteComponent() {
       {projects.length > 0 ? (
         <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
           {projects.map((project) => (
-            <Card
-              key={project.id}
-              className="p-6 rounded-3xl border border-white/10 shadow-[0_30px_70px_-40px_rgba(0,0,0,0.8)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_30px_80px_-40px_rgba(0,0,0,0.9)]  bg-(--project-accent)"
-            >
-              <CardHeader className="gap-4">
-                <div className="flex items-start gap-4">
-                  <div className="grid h-12 w-12 place-items-center rounded-2xl text-black shadow-[0_10px_30px_-15px_rgba(0,0,0,0.4)]">
-                    <Code className="size-5" />
+            <LinkA to={`/dashboard/project/$id`.replace('$id', String(project.id))}>
+              <Card
+                key={project.id}
+                className="p-6 rounded-3xl border border-white/10 shadow-[0_30px_70px_-40px_rgba(0,0,0,0.8)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_30px_80px_-40px_rgba(0,0,0,0.9)]  bg-(--project-accent)"
+              >
+                <CardHeader className="gap-4">
+                  <div className="flex items-start gap-4">
+                    <div className="grid h-12 w-12 place-items-center rounded-2xl text-black shadow-[0_10px_30px_-15px_rgba(0,0,0,0.4)]">
+                      <Code className="size-5" />
+                    </div>
+                    <div className="space-y-2">
+                      <CardTitle className="text-2xl text-white">{project.name}</CardTitle>
+                      <CardDescription className="max-w-sm text-sm text-slate-300">{project.description}</CardDescription>
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <CardTitle className="text-2xl text-white">{project.name}</CardTitle>
-                    <CardDescription className="max-w-sm text-sm text-slate-300">{project.description}</CardDescription>
+                </CardHeader>
+                <CardContent className="grid gap-3">
+                  <div className="flex flex-wrap gap-2">
+                    {project.tags.map((tag) => (
+                      <span key={tag.id} className="rounded-full bg-white/5 px-3 py-1 text-xs uppercase tracking-[0.25em] text-slate-200">{tag.name}</span>
+                    ))}
+                    <span className="rounded-full bg-white/5 px-3 py-1 text-xs uppercase tracking-[0.25em] text-slate-200">React</span>
+                  </div>
+                </CardContent>
+                <CardFooter className="justify-between gap-4 border-t border-white/10 pt-4 text-sm text-slate-400">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-xs uppercase tracking-[0.2em] text-slate-500">Updated</span>
+                    <span>{formatDistance(new Date(project.updatedAt), new Date(), { locale: enUS })} ago</span>
+                  </div>
+                </CardFooter>
+                <div className="mt-4 flex items-center gap-2 text-xs text-slate-200">
+                  <div className="flex items-center gap-2 rounded-full bg-white/5 px-3 py-2 text-xs text-slate-200">
+                    <Code className="size-4" color="#fff" /> {project._count.snippets}
+                  </div>
+                  <div className="flex items-center gap-2 rounded-full bg-white/5 px-3 py-2 text-xs text-slate-200">
+                    <Link className="size-4" color="#fff" /> {project._count.links}
+                  </div>
+                  <div className="flex items-center gap-2 rounded-full bg-white/5 px-3 py-2 text-xs text-slate-200">
+                    <Infinity className="size-4" color="#fff" /> {project._count.notes}
                   </div>
                 </div>
-              </CardHeader>
-              <CardContent className="grid gap-3">
-                <div className="flex flex-wrap gap-2">
-                  {project.tags.map((tag) => (
-                    <span key={tag.id} className="rounded-full bg-white/5 px-3 py-1 text-xs uppercase tracking-[0.25em] text-slate-200">{tag.name}</span>
-                  ))}
-                  <span className="rounded-full bg-white/5 px-3 py-1 text-xs uppercase tracking-[0.25em] text-slate-200">React</span>
-                </div>
-              </CardContent>
-              <CardFooter className="justify-between gap-4 border-t border-white/10 pt-4 text-sm text-slate-400">
-                <div className="flex flex-col gap-1">
-                  <span className="text-xs uppercase tracking-[0.2em] text-slate-500">Updated</span>
-                  <span>{formatDistance(new Date(project.updatedAt), new Date(), { locale: enUS })} ago</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button variant="outline" size="sm" onClick={() => openEditDialog(project)}>
-                    <Pencil className="size-4" /> Edit
-                  </Button>
-                  <Button variant="destructive" size="sm" onClick={() => handleDeleteProject(project)}>
-                    <Trash2 className="size-4" /> Delete
-                  </Button>
-                  <Button variant={'default'} size={'sm'} asChild>
-                    <LinkA to={`/dashboard/project/$id`.replace('$id', String(project.id))}>
-                      View
-                    </LinkA>
-                  </Button>
-                </div>
-              </CardFooter>
-              <div className="mt-4 flex items-center gap-2 text-xs text-slate-200">
-                <div className="flex items-center gap-2 rounded-full bg-white/5 px-3 py-2 text-xs text-slate-200">
-                  <Code className="size-4" color="#fff" /> {project._count.snippets}
-                </div>
-                <div className="flex items-center gap-2 rounded-full bg-white/5 px-3 py-2 text-xs text-slate-200">
-                  <Link className="size-4" color="#fff" /> {project._count.links}
-                </div>
-                <div className="flex items-center gap-2 rounded-full bg-white/5 px-3 py-2 text-xs text-slate-200">
-                  <Infinity className="size-4" color="#fff" /> {project._count.notes}
-                </div>
-              </div>
-            </Card>
+              </Card>
+            </LinkA>
           ))}
         </div>
       ) : (
