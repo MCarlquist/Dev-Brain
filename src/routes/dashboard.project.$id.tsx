@@ -20,12 +20,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
+import { Badge } from "@/components/ui/badge"
 import { Field, FieldGroup } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import type { ProjectDetail } from '../types'
+import type { ProjectDetail, Snippet } from '../types'
 import { Trash2 } from 'lucide-react'
+import SyntaxHighlighter from 'react-syntax-highlighter';
+import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 
 type CreateSnippetInput = {
   title: string
@@ -112,6 +115,8 @@ function RouteComponent() {
   const [snippetDialogOpen, setSnippetDialogOpen] = useState(false)
   const [noteDialogOpen, setNoteDialogOpen] = useState(false)
   const [linkDialogOpen, setLinkDialogOpen] = useState(false)
+  const [selectedSnippet, setSelectedSnippet] = useState<Snippet | null>(null)
+  const [snippetViewerOpen, setSnippetViewerOpen] = useState(false)
 
   const counts = useMemo(
     () => ({
@@ -224,12 +229,9 @@ function RouteComponent() {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
-          <Card>
+          <Card className='bg-transparent'>
             <CardHeader>
               <CardTitle>Overview</CardTitle>
-              <CardDescription>
-                Project metadata and related counts.
-              </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4">
               <div className="grid gap-2 sm:grid-cols-2">
@@ -289,7 +291,7 @@ function RouteComponent() {
         </TabsContent>
 
         <TabsContent value="snippets" className="space-y-4">
-          <Card>
+          <Card className='bg-transparent'>
             <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div>
                 <CardTitle>Snippets</CardTitle>
@@ -404,16 +406,27 @@ function RouteComponent() {
                   No snippets have been added yet.
                 </p>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-4 w-75">
                   {snippets.map((snippet) => (
                     <div
                       key={snippet.id}
-                      className="rounded-lg border border-border p-4"
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => {
+                        setSelectedSnippet(snippet)
+                        setSnippetViewerOpen(true)
+                      }}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                          event.preventDefault()
+                          setSelectedSnippet(snippet)
+                          setSnippetViewerOpen(true)
+                        }
+                      }}
+                      className="cursor-pointer rounded-lg border border-border p-4 hover:bg-muted"
                     >
+                      <Badge className="mb-2">{snippet.language}</Badge>
                       <p className="text-sm font-semibold">{snippet.title}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {snippet.language}
-                      </p>
                       <p className="mt-2 text-sm leading-6">
                         {snippet.description}
                       </p>
@@ -423,10 +436,55 @@ function RouteComponent() {
               )}
             </CardContent>
           </Card>
+
+          <Dialog open={snippetViewerOpen} onOpenChange={(value) => {
+            setSnippetViewerOpen(value)
+            if (!value) setSelectedSnippet(null)
+          }}>
+            <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto p-6">
+              <DialogHeader>
+                <DialogTitle>View Snippet</DialogTitle>
+              </DialogHeader>
+              {selectedSnippet ? (
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-sm font-semibold">Title</p>
+                    <p>{selectedSnippet.title}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold">Language</p>
+                    <p>{selectedSnippet.language}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold">Description</p>
+                    <p>{selectedSnippet.description || 'No description'}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold">Code</p>
+                    <pre className="rounded-md border border-border bg-surface p-3 text-xs overflow-x-auto">
+                      <SyntaxHighlighter
+                        language={selectedSnippet.language.toLowerCase()}
+                        style={docco}
+                      >
+                        {selectedSnippet.code}
+                      </SyntaxHighlighter>
+                    </pre>
+                  </div>
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button>Close</Button>
+                    </DialogClose>
+                  </DialogFooter>
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">No snippet selected.</p>
+              )}
+            </DialogContent>
+          </Dialog>
         </TabsContent>
 
         <TabsContent value="notes" className="space-y-4">
-          <Card>
+          <Card className='bg-transparent'>
             <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div>
                 <CardTitle>Notes</CardTitle>
@@ -521,7 +579,7 @@ function RouteComponent() {
         </TabsContent>
 
         <TabsContent value="links" className="space-y-4">
-          <Card>
+          <Card className='bg-transparent'>
             <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div>
                 <CardTitle>Links</CardTitle>

@@ -5,10 +5,21 @@
       "name": "Le Brain",
       "description": "a good description placeholder of a project im making",
       "createdAt": "2026-04-02T20:11:59.144Z",
-      "updatedAt": "2026-04-02T20:11:59.144Z"
+      "updatedAt": "2026-04-03T19:06:11.324Z"
     }
   ],
-  "snippets": [],
+  "snippets": [
+    {
+      "id": 1,
+      "title": "Snippet Title",
+      "description": "a simple hello world",
+      "language": "Javascript",
+      "code": "console.log('hello');",
+      "projectId": 1,
+      "createdAt": "2026-04-03T19:06:11.324Z",
+      "updatedAt": "2026-04-03T19:06:11.324Z"
+    }
+  ],
   "notes": [],
   "links": [],
   "tags": []

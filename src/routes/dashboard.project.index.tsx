@@ -8,7 +8,7 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import { Button } from '#/components/ui/button';
-import { Code, Folder, Infinity, Link, Plus, Pencil, Trash2 } from 'lucide-react';
+import { Code, Folder, Infinity, Link, Plus } from 'lucide-react';
 import { createServerFn, useServerFn } from '@tanstack/react-start';
 import {
   Card,
@@ -73,13 +73,6 @@ const updateProjectFn = createServerFn({ method: 'POST' })
     })
   })
 
-const deleteProjectFn = createServerFn({ method: 'POST' })
-  .inputValidator((data: { id: number }) => data)
-  .handler(async ({ data }) => {
-    const { deleteProject } = await import('#/server/db')
-    await deleteProject(data.id)
-    return { id: data.id }
-  })
 
 export const Route = createFileRoute('/dashboard/project/')({
   component: RouteComponent,
@@ -97,7 +90,6 @@ function RouteComponent() {
 
   const createProjectMutation = useServerFn(createProjectFn)
   const updateProjectMutation = useServerFn(updateProjectFn)
-  const deleteProjectMutation = useServerFn(deleteProjectFn)
 
   useEffect(() => {
     if (Array.isArray(initialProjects)) {
@@ -151,24 +143,6 @@ function RouteComponent() {
       setEditDialogOpen(false)
     },
   })
-
-  const openEditDialog = (project: ProjectListItem) => {
-    editForm.reset({
-      id: project.id,
-      name: project.name,
-      description: project.description,
-    })
-    setEditDialogOpen(true)
-  }
-
-  const handleDeleteProject = async (project: ProjectListItem) => {
-    if (!window.confirm(`Delete project "${project.name}"?`)) {
-      return
-    }
-
-    await deleteProjectMutation({ data: { id: project.id } })
-    setProjects((current) => current.filter((item) => item.id !== project.id))
-  }
 
   return (
     <div>
